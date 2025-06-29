@@ -1,98 +1,59 @@
 @extends('user.components.main')
 
 @section('title', 'Katalog Buku')
-@section('page-title', 'Katalog Buku Perpustakaan')
+
+{{-- Judul halaman dibuat lebih ringkas --}}
+@section('page-title', 'Temukan Buku Favoritmu')
 
 @section('content')
-    <div class="row mb-4">
-        <div class="col-md-4 col-lg-3 mb-3 mb-md-0">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-light py-3">
-                    <h6 class="m-0 fw-bold text-primary"><i class="bi bi-filter me-2"></i>Filter</h6>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('catalog.index') }}" method="GET">
-                        <div class="mb-3">
-                            <label for="search" class="form-label fw-semibold">Pencarian</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control form-control-sm" id="search" name="search"
-                                    placeholder="Judul, Pengarang, ISBN..." value="{{ $searchQuery ?? '' }}">
-                                <button class="btn btn-sm btn-outline-secondary" type="submit" id="search-button-submit">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-                            <small class="text-muted">Tekan Enter atau klik ikon cari.</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="category" class="form-label fw-semibold">Kategori</label>
-                            <select class="form-select form-select-sm" id="category" name="category">
-                                <option value="">-- Semua Kategori --</option>
-                                @foreach ($categories as $id => $name)
-                                    <option value="{{ $id }}"
-                                        {{ ($categoryFilter ?? '') == $id ? 'selected' : '' }}>
-                                        {{ $name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm">Terapkan Filter</button>
-                            <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary btn-sm">Reset Filter</a>
-                        </div>
-                    </form>
-                </div>
+    {{-- BAGIAN 1: HERO PENCARIAN BARU --}}
+    <div class="card card-body shadow-sm border-0 mb-4 p-4 text-center bg-light">
+        <h4 class="fw-bold">Pencarian Buku</h4>
+        <p class="text-muted">Cari berdasarkan judul, nama pengarang, atau ISBN.</p>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                {{-- Form hanya berisi input, tanpa tombol submit karena menggunakan AJAX --}}
+                <form action="{{ route('catalog.index') }}" method="GET" id="search-form">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="search" name="search"
+                            placeholder="Contoh: Laskar Pelangi..." value="{{ $searchQuery ?? '' }}">
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-8 col-lg-9">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <div class="row g-3" id="book-list-container">
-                        @include('user.books._book_list', ['books' => $books])
-                    </div>
-                    <div id="loading-indicator" class="text-center mt-4" style="display: none;">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    {{-- BAGIAN 2: FILTER KATEGORI SEBAGAI TOMBOL --}}
+    <div class="mb-4 text-center">
+        <a href="{{ route('catalog.index') }}"
+            class="btn btn-primary rounded-pill me-1 mb-2 {{ !request('category') ? 'active' : '' }}">
+            <i class="bi bi-grid-fill"></i> Semua Kategori
+        </a>
+        @foreach ($categories as $id => $name)
+            <a href="{{ route('catalog.index', ['category' => $id]) }}"
+                class="btn btn-outline-primary rounded-pill me-1 mb-2 {{ (request('category') ?? '') == $id ? 'active' : '' }}">
+                {{ $name }}
+            </a>
+        @endforeach
+    </div>
+
+    {{-- BAGIAN 3: KONTAINER DAFTAR BUKU --}}
+    <div class="row g-3 g-lg-4" id="book-list-container">
+        {{-- Partial view tetap dipanggil di sini --}}
+        @include('user.books._book_list', ['books' => $books])
+    </div>
+
+    {{-- Indikator loading tidak berubah --}}
+    <div id="loading-indicator" class="text-center mt-4" style="display: none;">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
 @endsection
 
 @section('css')
-    <style>
-        .book-card {
-            transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
-        }
-
-        .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
-        }
-
-        .book-cover {
-            height: 250px;
-            object-fit: cover;
-            border-top-left-radius: var(--bs-card-inner-border-radius);
-            border-top-right-radius: var(--bs-card-inner-border-radius);
-        }
-
-        .book-title {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-height: 2.5em;
-            font-size: 0.95rem;
-        }
-
-        .card-body .book-title a:hover {
-            color: var(--bs-primary) !important;
-        }
-    </style>
+    {{-- CSS untuk kartu buku akan dipindahkan ke file _book_list untuk kerapian --}}
 @endsection
 
 @section('script')
@@ -102,69 +63,63 @@
             const searchInput = $('#search');
             const resultsContainer = $('#book-list-container');
             const loadingIndicator = $('#loading-indicator');
-            const baseCatalogUrl = "{{ route('catalog.index') }}";
-            const categoryFilter = $('#category').val();
+            // Mengambil kategori saat ini dari URL untuk pencarian AJAX
+            const currentCategory = "{{ request('category', '') }}";
 
-            function resetToFilteredList() {
-                let url = baseCatalogUrl;
-                if (categoryFilter) {
-                    url += '?category=' + categoryFilter;
+            function performSearch(query) {
+                if (query.length >= 3) {
+                    loadingIndicator.show();
+                    resultsContainer.css('opacity', 0.5);
+
+                    $.ajax({
+                        url: "{{ route('catalog.search.api') }}",
+                        type: "GET",
+                        data: {
+                            search: query,
+                            // Kirimkan filter kategori saat ini bersamaan dengan pencarian
+                            category: currentCategory
+                        },
+                        success: function(response) {
+                            resultsContainer.html(response.html);
+                        },
+                        error: function(xhr) {
+                            console.error("Error searching:", xhr);
+                            resultsContainer.html(
+                                '<div class="col-12"><div class="alert alert-danger">Gagal memuat hasil pencarian.</div></div>'
+                            );
+                        },
+                        complete: function() {
+                            loadingIndicator.hide();
+                            resultsContainer.css('opacity', 1);
+                        }
+                    });
+                } else if (query.length === 0) {
+                    // Jika input kosong, muat ulang halaman ke kondisi filter kategori awal
+                    window.location.href = "{{ route('catalog.index') }}" + (currentCategory ? '?category=' +
+                        currentCategory : '');
+                } else {
+                    // Tampilkan pesan jika input kurang dari 3 karakter
+                    resultsContainer.html(
+                        '<div class="col-12 vh-50 d-flex flex-column justify-content-center align-items-center text-center text-muted">' +
+                        '<i class="bi bi-search fs-1"></i>' +
+                        '<h4>Ketik minimal 3 karakter</h4>' +
+                        '<p>untuk memulai pencarian buku.</p>' +
+                        '</div>'
+                    );
                 }
-                window.location.href = url;
             }
 
             searchInput.on('keyup', function() {
                 clearTimeout(searchTimeout);
                 const query = $(this).val().trim();
-
-                searchTimeout = setTimeout(function() {
-                    if (query.length >= 3) {
-                        loadingIndicator.show();
-                        resultsContainer.css('opacity', 0.5).find('.pagination').hide();
-
-                        $.ajax({
-                            url: "{{ route('catalog.search.api') }}",
-                            type: "GET",
-                            data: {
-                                search: query
-                            },
-                            success: function(response) {
-                                resultsContainer.html(response.html);
-                                loadingIndicator.hide();
-                                resultsContainer.css('opacity', 1);
-                            },
-                            error: function(xhr) {
-                                console.error("Error searching:", xhr);
-                                resultsContainer.html(
-                                    '<div class="col-12"><div class="alert alert-danger">Gagal memuat hasil pencarian.</div></div>'
-                                );
-                                loadingIndicator.hide();
-                                resultsContainer.css('opacity', 1);
-                            }
-                        });
-                    } else if (query.length === 0) {
-                        resetToFilteredList();
-                    } else {
-                        resultsContainer.html(
-                            '<div class="col-12 text-center text-muted">Ketik minimal 3 karakter untuk memulai pencarian...</div>'
-                        ).find('.pagination').hide();
-                        loadingIndicator.hide();
-                        resultsContainer.css('opacity', 1);
-                    }
-                }, 500);
+                searchTimeout = setTimeout(() => performSearch(query), 500); // delay 500ms
             });
 
-            $('form[action="{{ route('catalog.index') }}"]').on('submit', function(e) {
-                if (searchInput.val().trim() === '') {
-                    searchInput.prop('disabled', true);
-                }
-            });
-
-            $('#search-button-submit').on('click', function(e) {
+            // Mencegah form submit default jika menekan enter
+            $('#search-form').on('submit', function(e) {
                 e.preventDefault();
-                searchInput.trigger('keyup');
+                performSearch(searchInput.val().trim());
             });
-
         });
     </script>
 @endsection
