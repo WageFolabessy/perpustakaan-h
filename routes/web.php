@@ -102,8 +102,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('borrowings', [ReportController::class, 'borrowingReport'])->name('borrowings');
             Route::get('borrowings/export', [ReportController::class, 'exportBorrowingsExcel'])->name('borrowings.export');
-            Route::get('procurements', [ReportController::class, 'procurementReport'])->name('procurements');
-            Route::get('procurements/export', [ReportController::class, 'exportProcurementsExcel'])->name('procurements.export');
             Route::get('lost-books', [ReportController::class, 'lostBookReport'])->name('lost-books');
             Route::get('lost-books/export', [ReportController::class, 'exportLostBooksExcel'])->name('lost-books.export');
             Route::get('fines', [ReportController::class, 'fineReport'])->name('fines');
@@ -141,9 +139,9 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/', [UserDashboardController::class, 'index'])->name('dashboard');
 
     // --- Katalog Buku ---
-    Route::get('/katalog', [UserBookController::class, 'index'])->name('catalog.index');
-    Route::get('/katalog/search', [UserBookController::class, 'searchApi'])->name('catalog.search.api');
-    Route::get('/katalog/{book:slug}', [UserBookController::class, 'show'])->name('catalog.show');
+    Route::get('/buku', [UserBookController::class, 'index'])->name('catalog.index');
+    Route::get('/buku/search', [UserBookController::class, 'searchApi'])->name('catalog.search.api');
+    Route::get('/buku/{book:slug}', [UserBookController::class, 'show'])->name('catalog.show');
 
     // --- Riwayat Peminjaman --- 
     Route::get('/riwayat-pinjam', [UserBorrowingController::class, 'history'])->name('user.borrowings.history');

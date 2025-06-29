@@ -22,7 +22,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ Route::is('catalog.*') ? 'active' : '' }}"
                             href="{{ route('catalog.index') }}">
-                            Katalog Buku
+                            Buku
                         </a>
                     </li>
                     <li class="nav-item">
