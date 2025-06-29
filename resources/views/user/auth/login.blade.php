@@ -4,46 +4,52 @@
 
 @section('content')
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow-sm login-card border-0 mt-5">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="col-md-7 col-lg-5">
+                <div class="card shadow-lg border-0 rounded-lg">
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" width="80" height="80"
+                            class="mb-3">
+                        <h3 class="card-title mb-1 fw-bold">Login Anggota</h3>
+                        <p class="card-subtitle mb-0">Sistem Informasi Perpustakaan</p>
+                    </div>
                     <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" width="72" height="72"
-                                class="mb-3">
-                            <h3 class="card-title mb-1 fw-bold">Login Siswa</h3>
-                            <p class="text-muted">Sistem Informasi Perpustakaan</p>
-                        </div>
 
                         @include('admin.components.flash_messages')
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                Login Gagal. Periksa kembali NIS dan Password Anda.
+                            </div>
+                        @endif
 
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
 
-                            <div class="mb-3">
-                                <label for="nis" class="form-label">{{ __('NIS') }}</label>
+                            <div class="form-floating mb-3">
                                 <input id="nis" type="text" class="form-control @error('nis') is-invalid @enderror"
-                                    name="nis" value="{{ old('nis') }}" required autocomplete="nis" autofocus>
+                                    name="nis" value="{{ old('nis') }}" required autocomplete="nis" autofocus
+                                    placeholder="NIS">
+                                <label for="nis">{{ __('NIS') }}</label>
                                 @error('nis')
-                                    <span class="invalid-feedback" role="alert">
+                                    <div class="invalid-feedback">
                                         <strong>{{ $message }}</strong>
-                                    </span>
+                                    </div>
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
-                                <label for="password" class="form-label">{{ __('Password') }}</label>
+                            <div class="form-floating mb-3">
                                 <input id="password" type="password"
                                     class="form-control @error('password') is-invalid @enderror" name="password" required
-                                    autocomplete="current-password">
+                                    autocomplete="current-password" placeholder="Password">
+                                <label for="password">{{ __('Password') }}</label>
                                 @error('password')
-                                    <span class="invalid-feedback" role="alert">
+                                    <div class="invalid-feedback">
                                         <strong>{{ $message }}</strong>
-                                    </span>
+                                    </div>
                                 @enderror
                             </div>
 
-                            <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="remember" id="remember"
                                         {{ old('remember') ? 'checked' : '' }}>
@@ -51,29 +57,35 @@
                                         {{ __('Ingat Saya') }}
                                     </label>
                                 </div>
+                                @if (Route::has('password.request'))
+                                    <a href="{{ route('password.request') }}">
+                                        {{ __('Lupa Password?') }}
+                                    </a>
+                                @endif
                             </div>
 
-                            <div class="d-grid mb-3">
-                                <button type="submit" class="btn btn-primary btn-lg">
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg fw-bold">
                                     {{ __('Login') }}
                                 </button>
                             </div>
 
-                            <div class="text-center">
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Lupa Password Anda?') }}
-                                    </a>
-                                @endif
-                                @if (Route::has('register'))
-                                    <p class="mt-3 mb-0">Belum punya akun? <a href="{{ route('register') }}">Daftar di
-                                            sini</a></p>
-                                @endif
-                            </div>
+                            @if (Route::has('register'))
+                                <p class="text-center mt-4 mb-0">Belum punya akun? <a href="{{ route('register') }}">Daftar
+                                        di sini</a></p>
+                            @endif
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+@endsection
+
+@section('css')
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+    </style>
 @endsection
