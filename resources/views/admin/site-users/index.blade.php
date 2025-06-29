@@ -4,11 +4,11 @@
 @section('page-title', 'Manajemen Siswa')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Semua Siswa</h6>
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Semua Siswa</h6>
             <div>
-                <a href="{{ route('admin.site-users.create') }}" class="btn btn-primary btn-sm">
+                <a href="{{ route('admin.site-users.create') }}" class="btn btn-primary">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Siswa Manual
                 </a>
             </div>
@@ -22,37 +22,43 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover datatable" id="dataTableSiteUsers" width="100%"
-                        cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableSiteUsers" width="100%">
+                        <thead>
                             <tr>
-                                <th>No</th>
+                                <th class="no-sort" width="1%">No</th>
+                                <th>Siswa</th>
                                 <th>NIS</th>
-                                <th>Nama</th>
-                                <th>Email</th>
                                 <th>Kelas</th>
-                                <th class="text-center action-column">Aksi</th>
+                                <th>Jurusan</th>
+                                <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($siteUsers as $user)
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $loop->iteration }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ $user->name }}</div>
+                                                <div class="text-muted small">{{ $user->email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>{{ $user->nis }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
                                     <td>{{ $user->class ?: '-' }}</td>
+                                    <td>{{ $user->major ?: '-' }}</td>
                                     <td class="text-center action-column">
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('admin.site-users.show', $user) }}" class="btn btn-info"
-                                                title="Detail">
+                                            <a href="{{ route('admin.site-users.show', $user) }}"
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('admin.site-users.edit', $user) }}" class="btn btn-warning"
-                                                title="Edit">
+                                            <a href="{{ route('admin.site-users.edit', $user) }}"
+                                                class="btn btn-outline-warning" title="Edit">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" title="Hapus"
+                                            <button type="button" class="btn btn-outline-danger" title="Hapus"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $user->id }}">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -95,6 +101,21 @@
             @endif
         </div>
     </div>
+@endsection
+
+@section('css')
+    <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
+        .action-column {
+            white-space: nowrap;
+            width: 1%;
+        }
+    </style>
 @endsection
 
 @section('script')
