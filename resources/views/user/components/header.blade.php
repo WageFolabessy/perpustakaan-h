@@ -47,7 +47,7 @@
                             <button class="btn btn-outline-light btn-sm d-flex align-items-center" id="enable-fcm-button"
                                 type="button" data-bs-toggle="tooltip" data-bs-placement="bottom"
                                 title="Aktifkan Notifikasi di Browser Ini">
-                                <i class="bi bi-bell"></i>
+                                <i class="bi bi-bell"></i> <span>Aktifkan Notifikasi Browser</span>
                             </button>
                         </div>
 
