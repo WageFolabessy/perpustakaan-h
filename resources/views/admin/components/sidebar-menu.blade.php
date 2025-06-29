@@ -76,18 +76,48 @@
                     <i class="bi bi-calendar-x-fill"></i> Lewat Tempo
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.lost-reports.*') ? 'active' : '' }}"
+                    href="{{ route('admin.lost-reports.index') }}">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Kehilangan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.fines.*') ? 'active' : '' }}"
+                    href="{{ route('admin.fines.index') }}">
+                    <i class="bi bi-cash-coin"></i> Denda
+                </a>
+            </li>
+        </ul>
+    </li>
+    
+    <li class="nav-item mt-3">
+        <h6 class="sidebar-heading px-3 mb-2 text-uppercase">Laporan</h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.reports.borrowings') ? 'active' : '' }}"
+                    href="{{ route('admin.reports.borrowings') }}">
+                    <i class="bi bi-file-earmark-bar-graph-fill"></i> Peminjaman
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.reports.lost-books') ? 'active' : '' }}"
+                    href="{{ route('admin.reports.lost-books') }}">
+                    <i class="bi bi-file-earmark-excel-fill"></i> Kehilangan
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.reports.fines') ? 'active' : '' }}"
+                    href="{{ route('admin.reports.fines') }}">
+                    <i class="bi bi-file-earmark-medical-fill"></i> Denda
+                </a>
+            </li>
         </ul>
     </li>
 
     <li class="nav-item mt-3">
         <h6 class="sidebar-heading px-3 mb-2 text-uppercase">Sistem</h6>
         <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.reports.*') ? 'active' : '' }}"
-                    href="{{ route('admin.reports.borrowings') }}">
-                    <i class="bi bi-file-earmark-bar-graph-fill"></i> Laporan
-                </a>
-            </li>
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-3 {{ Route::is('admin.settings.*') ? 'active' : '' }}"
                     href="{{ route('admin.settings.index') }}">
