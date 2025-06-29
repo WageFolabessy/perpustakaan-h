@@ -4,24 +4,26 @@
 @section('page-title', 'Edit Penerbit: ' . $publisher->name)
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Formulir Edit Penerbit</h6>
-        </div>
-        <div class="card-body">
-            @include('admin.components.flash_messages')
-            @include('admin.components.validation_errors')
-
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
             <form action="{{ route('admin.publishers.update', $publisher) }}" method="POST">
                 @method('PUT')
-                @include('admin.publishers._form', ['publisher' => $publisher])
+                <div class="card shadow-sm rounded-4 border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-semibold">Formulir Edit Penerbit</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        @include('admin.components.flash_messages')
+                        @include('admin.components.validation_errors')
+
+                        @include('admin.publishers._form', ['publisher' => $publisher])
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-end border-0 pt-0 pb-3">
+                        <a href="{{ route('admin.publishers.index') }}" class="btn btn-secondary me-2">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
-@endsection
-
-@section('css')
-@endsection
-
-@section('script')
 @endsection

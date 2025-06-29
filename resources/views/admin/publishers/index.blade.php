@@ -4,10 +4,10 @@
 @section('page-title', 'Manajemen Penerbit')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Penerbit</h6>
-            <a href="{{ route('admin.publishers.create') }}" class="btn btn-primary btn-sm">
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Penerbit</h6>
+            <a href="{{ route('admin.publishers.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Penerbit
             </a>
         </div>
@@ -20,13 +20,12 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTablePublishers"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTablePublishers" width="100%">
+                        <thead>
                             <tr>
                                 <th class="text-center no-sort" width="1%">No</th>
-                                <th>Nama Penerbit</th>
-                                <th>Alamat</th>
+                                <th>Penerbit</th>
+                                <th class="text-center">Jumlah Buku</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
                         </thead>
@@ -34,19 +33,31 @@
                             @foreach ($publishers as $publisher)
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $publisher->name }}</td>
-                                    <td>{{ Str::limit($publisher->address, 70, '...') }}</td> {{-- Tingkatkan limit alamat --}}
+                                    <td>
+                                        <div class="fw-semibold">{{ $publisher->name }}</div>
+                                        @if ($publisher->address)
+                                            <p class="mb-0 mt-1 text-muted small fst-italic">
+                                                <i class="bi bi-geo-alt-fill me-1"></i>
+                                                {{ Str::limit($publisher->address, 70, '...') }}
+                                            </p>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill fs-6">
+                                            {{ $publisher->books_count ?? $publisher->books->count() }}
+                                        </span>
+                                    </td>
                                     <td class="action-column text-center">
                                         <div class="btn-group btn-group-sm" role="group">
                                             <a href="{{ route('admin.publishers.show', $publisher) }}"
-                                                class="btn btn-info" title="Detail">
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
                                             <a href="{{ route('admin.publishers.edit', $publisher) }}"
-                                                class="btn btn-warning" title="Edit">
+                                                class="btn btn-outline-warning" title="Edit">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" title="Hapus"
+                                            <button type="button" class="btn btn-outline-danger" title="Hapus"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $publisher->id }}">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -64,8 +75,8 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="deleteModalLabel-{{ $publisher->id }}">Konfirmasi Hapus
-                                    </h1>
+                                    <h1 class="modal-title fs-5" id="deleteModalLabel-{{ $publisher->id }}">Konfirmasi
+                                        Hapus</h1>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
@@ -93,14 +104,15 @@
 
 @section('css')
     <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
         .action-column {
             white-space: nowrap;
             width: 1%;
-            text-align: center
-        }
-
-        .action-column .btn .bi {
-            vertical-align: middle
         }
     </style>
 @endsection
