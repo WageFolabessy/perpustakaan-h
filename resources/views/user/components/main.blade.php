@@ -14,6 +14,34 @@
     <link href="{{ asset('assets/admin/vendor/bootstrap.min.css') }}" rel="stylesheet" />
     <link href="{{ asset('assets/user/css/custom-user.css') }}" rel="stylesheet" />
 
+    <style>
+        .navbar-dark .navbar-nav .nav-link.active {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+
+        .dropdown-item.active,
+        .dropdown-item:active {
+            color: var(--bs-primary-text-emphasis);
+            background-color: var(--bs-primary-bg-subtle);
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .footer-text-muted {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+        }
+    </style>
     @yield('css')
 
 </head>
