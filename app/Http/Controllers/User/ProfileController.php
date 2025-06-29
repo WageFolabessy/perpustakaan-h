@@ -26,7 +26,6 @@ class ProfileController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone_number = $validated['phone_number'] ?? null;
 
 
         if (!empty($validated['password'])) {
