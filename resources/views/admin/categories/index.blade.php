@@ -4,10 +4,10 @@
 @section('page-title', 'Manajemen Kategori')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Kategori</h6>
-            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary btn-sm">
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Kategori Buku</h6>
+            <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Kategori
             </a>
         </div>
@@ -20,14 +20,12 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTableCategories"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableCategories" width="100%">
+                        <thead>
                             <tr>
                                 <th class="text-center no-sort" width="1%">No</th>
-                                <th>Nama Kategori</th>
-                                <th>Slug</th>
-                                <th>Deskripsi</th>
+                                <th>Kategori</th>
+                                <th class="text-center">Jumlah Buku</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
                         </thead>
@@ -35,20 +33,35 @@
                             @foreach ($categories as $category)
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $category->name }}</td>
-                                    <td>{{ $category->slug }}</td>
-                                    <td>{{ Str::limit($category->description, 50, '...') }}</td>
+                                    <td>
+                                        <div class="fw-semibold">{{ $category->name }}</div>
+                                        <div class="text-muted small">
+                                            <span
+                                                class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill me-2">Slug:
+                                                {{ $category->slug }}</span>
+                                        </div>
+                                        @if ($category->description)
+                                            <p class="mb-0 mt-1 text-muted small fst-italic">
+                                                {{ Str::limit($category->description, 70, '...') }}
+                                            </p>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill fs-6">
+                                            {{ $category->books_count ?? $category->books->count() }}
+                                        </span>
+                                    </td>
                                     <td class="action-column text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ route('admin.categories.show', $category) }}" class="btn btn-info"
-                                                title="Detail">
+                                            <a href="{{ route('admin.categories.show', $category) }}"
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
                                             <a href="{{ route('admin.categories.edit', $category) }}"
-                                                class="btn btn-warning" title="Edit">
+                                                class="btn btn-outline-warning" title="Edit">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" title="Hapus"
+                                            <button type="button" class="btn btn-outline-danger" title="Hapus"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $category->id }}">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -95,14 +108,15 @@
 
 @section('css')
     <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
         .action-column {
             white-space: nowrap;
             width: 1%;
-            text-align: center
-        }
-
-        .action-column .btn .bi {
-            vertical-align: middle
         }
     </style>
 @endsection
