@@ -24,25 +24,25 @@ class DatabaseSeeder extends Seeder
     {
         Schema::disableForeignKeyConstraints();
 
-        // AdminUser::truncate();
-        // Category::truncate();
-        // Author::truncate();
-        // Publisher::truncate();
-        // Book::truncate();
-        // BookCopy::truncate();
+        AdminUser::truncate();
+        Category::truncate();
+        Author::truncate();
+        Publisher::truncate();
+        Book::truncate();
+        BookCopy::truncate();
 
-        // Schema::enableForeignKeyConstraints();
+        Schema::enableForeignKeyConstraints();
 
         AdminUser::factory(1)->create();
-        // SiteUser::factory(2)->create();
+        SiteUser::factory(2)->create();
 
         $this->call([
             CategorySeeder::class,
-        //     AuthorSeeder::class,
-        //     PublisherSeeder::class,
+            AuthorSeeder::class,
+            PublisherSeeder::class,
             BookSeeder::class,
-            // SettingSeeder::class,
-        //     // BookingSeeder::class,
+            SettingSeeder::class,
+            BookingSeeder::class,
         ]);
     }
 }

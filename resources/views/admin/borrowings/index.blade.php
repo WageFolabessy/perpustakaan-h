@@ -4,10 +4,10 @@
 @section('page-title', 'Daftar Semua Peminjaman')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Riwayat Peminjaman Buku</h6>
-            <a href="{{ route('admin.borrowings.create') }}" class="btn btn-primary btn-sm">
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Riwayat Peminjaman Buku</h6>
+            <a href="{{ route('admin.borrowings.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Peminjaman Baru
             </a>
         </div>
@@ -20,17 +20,13 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTableBorrowings"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableBorrowings" width="100%">
+                        <thead>
                             <tr>
-                                <th class="text-center no-sort" width="1%">No</th>
+                                <th class="no-sort" width="1%">No</th>
                                 <th>Peminjam</th>
-                                <th>Judul Buku</th>
-                                <th>Kode Eksemplar</th>
-                                <th>Tgl Pinjam</th>
-                                <th>Jatuh Tempo</th>
-                                <th>Tgl Kembali</th>
+                                <th>Buku yang Dipinjam</th>
+                                <th>Periode</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
@@ -39,39 +35,55 @@
                             @foreach ($borrowings as $borrowing)
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $borrowing->siteUser?->name ?: 'N/A' }} <br><small class="text-muted">NIS:
-                                            {{ $borrowing->siteUser?->nis ?: 'N/A' }}</small></td>
-                                    <td>{{ $borrowing->bookCopy?->book?->title ?: 'N/A' }}</td>
-                                    <td>{{ $borrowing->bookCopy?->copy_code ?: 'N/A' }}</td>
-                                    <td>{{ $borrowing->borrow_date ? $borrowing->borrow_date->isoFormat('D MMM YYYY') : '-' }}
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ $borrowing->siteUser?->name ?: 'N/A' }}</div>
+                                                <div class="text-muted small">NIS: {{ $borrowing->siteUser?->nis ?: 'N/A' }}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>{{ $borrowing->due_date ? $borrowing->due_date->isoFormat('D MMM YYYY') : '-' }}
+                                    <td>
+                                        <div class="fw-semibold">{{ $borrowing->bookCopy?->book?->title ?: 'N/A' }}</div>
+                                        <small class="text-muted">Kode:
+                                            {{ $borrowing->bookCopy?->copy_code ?: 'N/A' }}</small>
                                     </td>
-                                    <td>{{ $borrowing->return_date ? $borrowing->return_date->isoFormat('D MMM YYYY') : '-' }}
+                                    <td class="small">
+                                        <div><span class="text-muted">Pinjam:</span>
+                                            {{ $borrowing->borrow_date ? $borrowing->borrow_date->isoFormat('D MMM YY') : '-' }}
+                                        </div>
+                                        <div><span class="text-muted">Tempo:</span>
+                                            {{ $borrowing->due_date ? $borrowing->due_date->isoFormat('D MMM YY') : '-' }}
+                                        </div>
+                                        @if ($borrowing->return_date)
+                                            <div class="text-success"><span class="text-muted">Kembali:</span>
+                                                {{ $borrowing->return_date->isoFormat('D MMM YY') }}</div>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @if ($borrowing->status)
                                             <span
-                                                class="badge bg-{{ $borrowing->status->badgeColor() }}">{{ $borrowing->status->label() }}</span>
+                                                class="badge rounded-pill bg-{{ $borrowing->status->badgeColor() }}">{{ $borrowing->status->label() }}</span>
                                         @else
-                                            <span class="badge bg-secondary">-</span>
+                                            <span class="badge rounded-pill bg-secondary">-</span>
                                         @endif
                                     </td>
                                     <td class="action-column text-center">
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('admin.borrowings.show', $borrowing) }}" class="btn btn-info"
-                                                title="Detail">
+                                            <a href="{{ route('admin.borrowings.show', $borrowing) }}"
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
                                             @if (in_array($borrowing->status, [\App\Enum\BorrowingStatus::Borrowed, \App\Enum\BorrowingStatus::Overdue]))
-                                                <button type="button" class="btn btn-success" title="Proses Pengembalian"
-                                                    data-bs-toggle="modal"
+                                                <button type="button" class="btn btn-outline-success"
+                                                    title="Proses Pengembalian" data-bs-toggle="modal"
                                                     data-bs-target="#returnModal-{{ $borrowing->id }}">
                                                     <i class="bi bi-check-lg"></i>
                                                 </button>
                                             @endif
                                             @if (!$borrowing->status->isActive())
-                                                <button type="button" class="btn btn-danger" title="Hapus Riwayat"
+                                                <button type="button" class="btn btn-outline-danger" title="Hapus Riwayat"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteModal-{{ $borrowing->id }}">
                                                     <i class="bi bi-trash-fill"></i>
@@ -93,12 +105,10 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="deleteModalLabel-{{ $borrowing->id }}">Konfirmasi
-                                            Hapus</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            Hapus</h1><button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                     </div>
-                                    <div class="modal-body">
-                                        Apakah Anda yakin ingin menghapus riwayat peminjaman buku
+                                    <div class="modal-body">Apakah Anda yakin ingin menghapus riwayat peminjaman buku
                                         <strong>{{ $borrowing->bookCopy?->book?->title }}</strong> oleh
                                         <strong>{{ $borrowing->siteUser?->name }}</strong>?
                                     </div>
@@ -117,7 +127,6 @@
                         </div>
                     @endif
 
-                    {{-- Modal Proses Pengembalian (jika aktif) --}}
                     @if (in_array($borrowing->status, [\App\Enum\BorrowingStatus::Borrowed, \App\Enum\BorrowingStatus::Overdue]))
                         <div class="modal fade" id="returnModal-{{ $borrowing->id }}" tabindex="-1"
                             aria-labelledby="returnModalLabel-{{ $borrowing->id }}" aria-hidden="true">
@@ -128,9 +137,8 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h1 class="modal-title fs-5" id="returnModalLabel-{{ $borrowing->id }}">
-                                                Konfirmasi Pengembalian</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                                Konfirmasi Pengembalian</h1><button type="button" class="btn-close"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
                                             <p>Anda akan memproses pengembalian untuk:</p>
@@ -151,9 +159,9 @@
                                             <div class="mb-3">
                                                 <label for="return_notes-{{ $borrowing->id }}" class="form-label">Catatan
                                                     Pengembalian (Opsional):</label>
-                                                <textarea class="form-control @error('return_notes') is-invalid @enderror" id="return_notes-{{ $borrowing->id }}"
-                                                    name="return_notes" rows="3">{{ old('return_notes') }}</textarea>
-                                                @error('return_notes')
+                                                <textarea class="form-control @error('return_notes', 'return_' . $borrowing->id) is-invalid @enderror"
+                                                    id="return_notes-{{ $borrowing->id }}" name="return_notes" rows="3">{{ old('return_notes') }}</textarea>
+                                                @error('return_notes', 'return_' . $borrowing->id)
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </div>
@@ -161,9 +169,9 @@
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-check-circle-fill me-1"></i> Ya, Proses Pengembalian
-                                            </button>
+                                            <button type="submit" class="btn btn-success"><i
+                                                    class="bi bi-check-circle-fill me-1"></i> Ya, Proses
+                                                Pengembalian</button>
                                         </div>
                                     </div>
                                 </form>
@@ -178,14 +186,22 @@
 
 @section('css')
     <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
         .action-column {
             white-space: nowrap;
             width: 1%;
             text-align: center;
         }
 
-        .action-column .btn .bi {
-            vertical-align: middle;
+        .badge.rounded-pill {
+            padding: 0.4em 0.8em;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
     </style>
 @endsection
