@@ -4,89 +4,77 @@
 @section('page-title', 'Laporan Peminjaman Buku')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Filter Laporan Peminjaman</h6>
-            @if (!$errors->has('start_date') && !$errors->has('end_date') && $startDate && $endDate)
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Laporan Peminjaman</h6>
+            @if (
+                !$errors->has('start_date') &&
+                    !$errors->has('end_date') &&
+                    isset($startDate) &&
+                    isset($endDate) &&
+                    isset($borrowings))
                 <form action="{{ route('admin.reports.borrowings.export') }}" method="GET" class="d-inline-block">
                     <input type="hidden" name="start_date" value="{{ $startDate }}">
                     <input type="hidden" name="end_date" value="{{ $endDate }}">
-                    <button type="submit" class="btn btn-success btn-sm">
-                        <i class="bi bi-file-earmark-excel"></i> Export Excel
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel-fill me-1"></i> Export Excel
                     </button>
                 </form>
             @endif
         </div>
-        <div class="card-body">
-            <form action="{{ route('admin.reports.borrowings') }}" method="GET" class="row g-3 align-items-end mb-3">
-                <div class="col-md-5">
-                    <label for="start_date" class="form-label">Tanggal Mulai Pinjam</label>
-                    <input type="date" class="form-control form-control-sm @error('start_date') is-invalid @enderror"
-                        id="start_date" name="start_date" value="{{ $startDate ?? '' }}" required>
-                    @error('start_date')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-md-5">
-                    <label for="end_date" class="form-label">Tanggal Selesai Pinjam</label>
-                    <input type="date" class="form-control form-control-sm @error('end_date') is-invalid @enderror"
-                        id="end_date" name="end_date" value="{{ $endDate ?? '' }}" required>
-                    @error('end_date')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                        <i class="bi bi-filter"></i> Tampilkan
-                    </button>
-                    <a href="{{ route('admin.reports.borrowings') }}" class="btn btn-secondary btn-sm w-100 mt-1"
-                        title="Reset Filter ke Hari Ini">
-                        <i class="bi bi-arrow-clockwise"></i> Hari Ini
-                    </a>
-                </div>
-            </form>
-            @include('admin.components.flash_messages')
-            @if ($errors->any() && !$errors->has('start_date') && !$errors->has('end_date'))
-                @include('admin.components.validation_errors')
-            @endif
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">
-                Hasil Laporan Peminjaman
-                @if (!$errors->has('start_date') && !$errors->has('end_date') && $startDate && $endDate)
-                    ({{ \Carbon\Carbon::parse($startDate)->isoFormat('D MMM YY') }} -
-                    {{ \Carbon\Carbon::parse($endDate)->isoFormat('D MMM YY') }})
-                    ({{ $borrowings->count() }} Data)
-                @elseif($errors->has('start_date') || $errors->has('end_date'))
-                    <span class="text-danger">(Rentang Tanggal Tidak Valid)</span>
-                @endif
-            </h6>
-        </div>
-        <div class="card-body">
-            @if (!$errors->has('start_date') && !$errors->has('end_date'))
-                @if ($borrowings->isEmpty())
-                    <div class="alert alert-info text-center">
-                        Tidak ada data peminjaman ditemukan untuk rentang tanggal yang dipilih
-                        ({{ \Carbon\Carbon::parse($startDate)->isoFormat('D MMM YY') }} -
-                        {{ \Carbon\Carbon::parse($endDate)->isoFormat('D MMM YY') }}).
+        <div class="card-body p-4">
+            <div class="filter-panel p-3 rounded-3 mb-4">
+                <form action="{{ route('admin.reports.borrowings') }}" method="GET" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="start_date" class="form-label fw-semibold">Tanggal Mulai</label>
+                        <input type="date" class="form-control @error('start_date') is-invalid @enderror" id="start_date"
+                            name="start_date" value="{{ $startDate ?? '' }}" required>
+                        @error('start_date')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
+                    <div class="col-md-5">
+                        <label for="end_date" class="form-label fw-semibold">Tanggal Selesai</label>
+                        <input type="date" class="form-control @error('end_date') is-invalid @enderror" id="end_date"
+                            name="end_date" value="{{ $endDate ?? '' }}" required>
+                        @error('end_date')
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Tampilkan</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section-divider"><span>Hasil Laporan</span></div>
+
+            <h5 class="text-center mb-3">
+                @if (isset($startDate) && isset($endDate))
+                    Menampilkan {{ $borrowings->count() }} Data Peminjaman
+                    <br>
+                    <small class="text-muted fw-normal">Periode:
+                        {{ \Carbon\Carbon::parse($startDate)->isoFormat('D MMM YY') }} -
+                        {{ \Carbon\Carbon::parse($endDate)->isoFormat('D MMM YY') }}</small>
+                @else
+                    <span class="text-muted fw-normal">Silakan pilih rentang tanggal untuk menampilkan laporan.</span>
+                @endif
+            </h5>
+
+            @if ($errors->has('start_date') || $errors->has('end_date'))
+                <div class="alert alert-warning text-center">Silakan perbaiki input tanggal pada filter di atas.</div>
+            @elseif(isset($borrowings))
+                @if ($borrowings->isEmpty())
+                    <div class="alert alert-light text-center">Tidak ada data peminjaman ditemukan untuk rentang tanggal
+                        yang dipilih.</div>
                 @else
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-striped datatable"
-                            id="dataTableReportBorrowings" width="100%" cellspacing="0">
-                            <thead class="table-light">
+                        <table class="table table-hover datatable" id="dataTableReportBorrowings" width="100%">
+                            <thead>
                                 <tr>
                                     <th class="text-center">No</th>
-                                    <th>Peminjam</th>
-                                    <th>Judul Buku</th>
-                                    <th>Kode Eksemplar</th>
-                                    <th>Tgl Pinjam</th>
-                                    <th>Jatuh Tempo</th>
-                                    <th>Tgl Kembali</th>
-                                    <th class="text-center">Status</th>
+                                    <th>Peminjam & Buku</th>
+                                    <th>Periode & Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,22 +82,32 @@
                                     <tr class="align-middle">
                                         <td class="text-center">{{ $index + 1 }}</td>
                                         <td>
-                                            {{ $borrowing->siteUser?->name ?? 'N/A' }}
-                                            ({{ $borrowing->siteUser?->nis ?? 'N/A' }})
+                                            <div class="d-flex align-items-center">
+                                                <div class="ms-3">
+                                                    <div class="fw-semibold">{{ $borrowing->siteUser?->name ?? 'N/A' }}
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        <i class="bi bi-book-fill me-1"></i>
+                                                        {{ $borrowing->bookCopy?->book?->title ?? 'N/A' }}
+                                                        (Kode: {{ $borrowing->bookCopy?->copy_code ?? 'N/A' }})
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </td>
-                                        <td>{{ $borrowing->bookCopy?->book?->title ?? 'N/A' }}</td>
-                                        <td>{{ $borrowing->bookCopy?->copy_code ?? 'N/A' }}</td>
-                                        <td>{{ $borrowing->borrow_date ? $borrowing->borrow_date->format('d/m/Y') : '-' }}
-                                        </td>
-                                        <td>{{ $borrowing->due_date ? $borrowing->due_date->format('d/m/Y') : '-' }}</td>
-                                        <td>{{ $borrowing->return_date ? $borrowing->return_date->format('d/m/Y') : '-' }}
-                                        </td>
-                                        <td class="text-center">
+                                        <td class="small">
+                                            <div><span class="text-muted">Pinjam:</span>
+                                                {{ $borrowing->borrow_date ? $borrowing->borrow_date->isoFormat('D MMM YY') : '-' }}
+                                            </div>
+                                            <div><span class="text-muted">Tempo:</span>
+                                                {{ $borrowing->due_date ? $borrowing->due_date->isoFormat('D MMM YY') : '-' }}
+                                            </div>
+                                            @if ($borrowing->return_date)
+                                                <div class="text-success"><span class="text-muted">Kembali:</span>
+                                                    {{ $borrowing->return_date->isoFormat('D MMM YY') }}</div>
+                                            @endif
                                             @if ($borrowing->status)
                                                 <span
-                                                    class="badge bg-{{ $borrowing->status->badgeColor() }}">{{ $borrowing->status->label() }}</span>
-                                            @else
-                                                -
+                                                    class="badge rounded-pill bg-{{ $borrowing->status->badgeColor() }} mt-1">{{ $borrowing->status->label() }}</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -118,17 +116,54 @@
                         </table>
                     </div>
                 @endif
-            @else
-                <div class="alert alert-warning text-center">
-                    Silakan perbaiki input tanggal pada filter di atas.
-                </div>
             @endif
         </div>
     </div>
-
 @endsection
 
 @section('css')
+    <style>
+        .filter-panel {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .section-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #6c757d;
+            font-size: .9rem;
+            text-transform: uppercase;
+            letter-spacing: .5px
+        }
+
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #dee2e6
+        }
+
+        .section-divider:not(:empty)::before {
+            margin-right: .75em
+        }
+
+        .section-divider:not(:empty)::after {
+            margin-left: .75em
+        }
+
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
+        .badge.rounded-pill {
+            font-weight: 600;
+        }
+    </style>
 @endsection
 
 @section('script')
