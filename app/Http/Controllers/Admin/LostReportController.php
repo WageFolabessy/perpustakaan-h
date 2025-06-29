@@ -44,7 +44,7 @@ class LostReportController extends Controller
     public function show(LostReport $lost_report): View
     {
         $lost_report->load([
-            'reporter:id,nis,name,class,major,email,phone_number',
+            'reporter:id,nis,name,class,major,email',
             'bookCopy:id,copy_code,status,condition,book_id',
             'bookCopy.book:id,title,isbn,location,cover_image',
             'borrowing' => function ($query) {

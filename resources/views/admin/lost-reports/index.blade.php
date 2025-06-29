@@ -4,14 +4,12 @@
 @section('page-title', 'Laporan Kehilangan Buku')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Laporan Kehilangan</h6>
-            <form action="{{ route('admin.lost-reports.index') }}" method="GET" class="float-end d-inline-block ms-3"
-                style="max-width: 200px;">
-                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()"
-                    aria-label="Filter Status Laporan">
-                    <option value="">-- Semua Status --</option>
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Laporan Kehilangan</h6>
+            <form action="{{ route('admin.lost-reports.index') }}" method="GET" style="max-width: 220px;">
+                <select name="status" class="form-select" onchange="this.form.submit()" aria-label="Filter Status Laporan">
+                    <option value="">-- Tampilkan Semua Status --</option>
                     @foreach ($validStatuses as $status)
                         <option value="{{ $status->value }}" {{ $statusFilter == $status->value ? 'selected' : '' }}>
                             {{ $status->label() }}
@@ -33,16 +31,13 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTableLostReports"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableLostReports" width="100%">
+                        <thead>
                             <tr>
                                 <th class="text-center no-sort" width="1%">ID</th>
-                                <th>Pelapor (Siswa)</th>
-                                <th>Buku / Eksemplar</th>
-                                <th>Tgl Lapor</th>
+                                <th>Laporan</th>
+                                <th>Waktu</th>
                                 <th class="text-center">Status</th>
-                                <th>Admin Verifikasi</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
                         </thead>
@@ -51,46 +46,52 @@
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $report->id }}</td>
                                     <td>
-                                        {{ $report->reporter?->name ?? 'N/A' }}<br>
-                                        <small class="text-muted">NIS: {{ $report->reporter?->nis ?? 'N/A' }}</small>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ $report->reporter?->name ?? 'N/A' }}</div>
+                                                <div class="text-muted small">
+                                                    <i class="bi bi-book-fill me-1"></i>
+                                                    {{ $report->bookCopy?->book?->title ?? 'N/A' }} (Kode:
+                                                    {{ $report->bookCopy?->copy_code ?? 'N/A' }})
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>
-                                        {{ $report->bookCopy?->book?->title ?? 'N/A' }}<br>
-                                        <small class="text-muted">Kode: {{ $report->bookCopy?->copy_code ?? 'N/A' }}</small>
-                                    </td>
-                                    <td>{{ $report->report_date ? $report->report_date->isoFormat('D MMM YYYY, HH:mm') : '-' }}
+                                    <td class="small">
+                                        <div><span class="text-muted">Dilaporkan:</span>
+                                            {{ $report->report_date ? $report->report_date->isoFormat('D MMM YY, HH:mm') : '-' }}
+                                        </div>
+                                        @if ($report->verifier)
+                                            <div class="text-success"><span class="text-muted">Diverifikasi:</span>
+                                                {{ $report->verifier->name }}</div>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         @if ($report->status)
                                             <span
-                                                class="badge bg-{{ $report->status->badgeColor() }}">{{ $report->status->label() }}</span>
-                                        @else
-                                            -
+                                                class="badge rounded-pill bg-{{ $report->status->badgeColor() }}">{{ $report->status->label() }}</span>
                                         @endif
                                     </td>
-                                    <td>{{ $report->verifier?->name ?? '-' }}</td>
                                     <td class="action-column text-center">
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('admin.lost-reports.show', $report) }}" class="btn btn-info"
-                                                title="Detail Laporan">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ route('admin.lost-reports.show', $report) }}"
+                                                class="btn btn-outline-primary" title="Detail Laporan">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            {{-- Tombol Verifikasi hanya jika status Reported --}}
                                             @if ($report->status === App\Enum\LostReportStatus::Reported)
                                                 <form action="{{ route('admin.lost-reports.verify', $report) }}"
                                                     method="POST" class="d-inline"
-                                                    onsubmit="return confirm('Verifikasi laporan ini?');">
+                                                    onsubmit="return confirm('Verifikasi laporan ini? Buku akan ditandai sebagai \'Dalam Investigasi\'.');">
                                                     @csrf
                                                     @method('PATCH')
-                                                    <button type="submit" class="btn btn-primary"
-                                                        title="Verifikasi Laporan">
-                                                        <i class="bi bi-check-circle"></i>
-                                                    </button>
+                                                    <button type="submit" class="btn btn-outline-info"
+                                                        title="Verifikasi Laporan"><i
+                                                            class="bi bi-check-circle"></i></button>
                                                 </form>
                                             @endif
                                             @if (in_array($report->status, [App\Enum\LostReportStatus::Reported, App\Enum\LostReportStatus::Verified]))
-                                                <button type="button" class="btn btn-success" title="Selesaikan Laporan"
-                                                    data-bs-toggle="modal"
+                                                <button type="button" class="btn btn-outline-success"
+                                                    title="Selesaikan Laporan" data-bs-toggle="modal"
                                                     data-bs-target="#resolveModal-{{ $report->id }}">
                                                     <i class="bi bi-check2-all"></i>
                                                 </button>
@@ -114,20 +115,14 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             <h1 class="modal-title fs-5" id="resolveModalLabel-{{ $report->id }}">
-                                                Selesaikan Laporan Kehilangan</h1>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
+                                                Selesaikan Laporan Kehilangan</h1><button type="button" class="btn-close"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Anda akan menyelesaikan laporan kehilangan untuk:</p>
-                                            <ul>
-                                                <li>Buku: <strong>{{ $report->bookCopy?->book?->title ?? 'N/A' }}</strong>
-                                                    (Kode: {{ $report->bookCopy?->copy_code ?? 'N/A' }})
-                                                </li>
-                                                <li>Pelapor: <strong>{{ $report->reporter?->name ?? 'N/A' }}</strong></li>
-                                            </ul>
+                                            <p>Anda akan menyelesaikan laporan kehilangan untuk buku
+                                                <strong>{{ $report->bookCopy?->book?->title ?? 'N/A' }}</strong>.</p>
                                             <p>Status buku akan diubah menjadi 'Hilang'. Jika terhubung dengan peminjaman
-                                                dan ada biaya penggantian di pengaturan sistem, denda akan dibuat/diperbaharui.</p>
+                                                dan ada biaya penggantian, denda akan dibuat/diperbaharui.</p>
                                             <div class="mb-3">
                                                 <label for="resolution_notes-{{ $report->id }}"
                                                     class="form-label">Catatan Penyelesaian <span
@@ -139,13 +134,10 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Batal</button>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-check2-all me-1"></i> Ya, Selesaikan Laporan
-                                            </button>
-                                        </div>
+                                        <div class="modal-footer"><button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button><button type="submit"
+                                                class="btn btn-success"><i class="bi bi-check2-all me-1"></i> Ya, Selesaikan
+                                                Laporan</button></div>
                                     </div>
                                 </form>
                             </div>
@@ -159,14 +151,21 @@
 
 @section('css')
     <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
         .action-column {
             white-space: nowrap;
             width: 1%;
-            text-align: center;
         }
 
-        .action-column .btn .bi {
-            vertical-align: middle;
+        .badge.rounded-pill {
+            padding: 0.4em 0.8em;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
     </style>
 @endsection
