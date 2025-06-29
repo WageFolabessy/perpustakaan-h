@@ -4,10 +4,10 @@
 @section('page-title', 'Manajemen Pengarang')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Pengarang</h6>
-            <a href="{{ route('admin.authors.create') }}" class="btn btn-primary btn-sm">
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Pengarang</h6>
+            <a href="{{ route('admin.authors.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Pengarang
             </a>
         </div>
@@ -20,13 +20,12 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTableAuthors"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableAuthors" width="100%">
+                        <thead>
                             <tr>
-                                <th class="text-center">No</th>
-                                <th>Nama Pengarang</th>
-                                <th>Bio</th>
+                                <th class="text-center no-sort" width="1%">No</th>
+                                <th>Pengarang</th>
+                                <th class="text-center">Jumlah Karya</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
                         </thead>
@@ -34,19 +33,34 @@
                             @foreach ($authors as $author)
                                 <tr class="align-middle">
                                     <td class="text-center">{{ $loop->iteration }}</td>
-                                    <td>{{ $author->name }}</td>
-                                    <td>{{ Str::limit($author->bio, 70, '...') }}</td>
-                                    <td class="action-column">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="ms-3">
+                                                <div class="fw-semibold">{{ $author->name }}</div>
+                                                @if ($author->bio)
+                                                    <p class="mb-0 mt-1 text-muted small fst-italic">
+                                                        {{ Str::limit($author->bio, 70, '...') }}
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill fs-6">
+                                            {{ $author->books_count ?? $author->books->count() }}
+                                        </span>
+                                    </td>
+                                    <td class="action-column text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ route('admin.authors.show', $author) }}" class="btn btn-info"
-                                                title="Detail">
+                                            <a href="{{ route('admin.authors.show', $author) }}"
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('admin.authors.edit', $author) }}" class="btn btn-warning"
-                                                title="Edit">
+                                            <a href="{{ route('admin.authors.edit', $author) }}"
+                                                class="btn btn-outline-warning" title="Edit">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" title="Hapus"
+                                            <button type="button" class="btn btn-outline-danger" title="Hapus"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $author->id }}">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -58,7 +72,6 @@
                     </table>
                 </div>
 
-                {{-- Modal Hapus --}}
                 @foreach ($authors as $author)
                     <div class="modal fade" id="deleteModal-{{ $author->id }}" tabindex="-1"
                         aria-labelledby="deleteModalLabel-{{ $author->id }}" aria-hidden="true">
@@ -93,6 +106,18 @@
 @endsection
 
 @section('css')
+    <style>
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
+        .action-column {
+            white-space: nowrap;
+            width: 1%;
+        }
+    </style>
 @endsection
 
 @section('script')

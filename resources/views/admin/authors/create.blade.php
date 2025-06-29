@@ -4,23 +4,25 @@
 @section('page-title', 'Tambah Pengarang Baru')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Formulir Tambah Pengarang</h6>
-        </div>
-        <div class="card-body">
-            @include('admin.components.flash_messages')
-            @include('admin.components.validation_errors')
-
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
             <form action="{{ route('admin.authors.store') }}" method="POST">
-                @include('admin.authors._form')
+                <div class="card shadow-sm rounded-4 border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="m-0 fw-semibold">Formulir Tambah Pengarang</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        @include('admin.components.flash_messages')
+                        @include('admin.components.validation_errors')
+
+                        @include('admin.authors._form')
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-end border-0 pt-0 pb-3">
+                        <a href="{{ route('admin.authors.index') }}" class="btn btn-secondary me-2">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Pengarang</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
-@endsection
-
-@section('css')
-@endsection
-
-@section('script')
 @endsection
