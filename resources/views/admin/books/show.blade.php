@@ -2,129 +2,207 @@
 
 @section('title', 'Detail Buku')
 @section('page-title')
-    Detail Buku: {{ $book->title }}
+    Detail Buku
 @endsection
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Informasi Buku</h6>
-            <div>
-                <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-warning btn-sm" title="Edit Buku">
-                    <i class="bi bi-pencil-fill me-1"></i> Edit Buku
-                </a>
-                <a href="{{ route('admin.books.index') }}" class="btn btn-secondary btn-sm" title="Kembali ke Daftar">
-                    <i class="bi bi-arrow-left"></i> Kembali
-                </a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="m-0">Profil Buku: <span class="fw-light">{{ $book->title }}</span></h5>
+        <div>
+            <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-warning" title="Edit Buku">
+                <i class="bi bi-pencil-fill me-1"></i> Edit
+            </a>
+            <a href="{{ route('admin.books.index') }}" class="btn btn-secondary" title="Kembali ke Daftar">
+                <i class="bi bi-arrow-left me-1"></i> Kembali
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow-sm rounded-4 border-0 mb-4">
+                <div class="card-body text-center p-4">
+                    <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('assets/images/no-image.png') }}"
+                        alt="Sampul {{ $book->title }}" class="img-fluid rounded-3" style="max-height: 400px;">
+                </div>
+            </div>
+
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 fw-semibold">Daftar Eksemplar ({{ $book->copies->count() }} Total)</h6>
+                </div>
+                <div class="card-body p-0">
+                    @if ($book->copies->isEmpty())
+                        <div class="alert alert-info text-center m-3">
+                            Belum ada data eksemplar untuk buku ini.
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="ps-3">Kode</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center pe-3">Kondisi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($book->copies as $copy)
+                                        <tr class="align-middle">
+                                            <td class="ps-3 fw-semibold">{{ $copy->copy_code }}</td>
+                                            <td class="text-center">
+                                                <span
+                                                    class="badge rounded-pill bg-{{ $copy->status->badgeColor() }}">{{ $copy->status->label() }}</span>
+                                            </td>
+                                            <td class="text-center pe-3">
+                                                <span
+                                                    class="badge rounded-pill bg-{{ $copy->condition->badgeColor() }}">{{ $copy->condition->label() }}</span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <dl class="row">
-                        <dt class="col-sm-4 col-lg-3">Judul</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->title }}</dd>
 
-                        <dt class="col-sm-4 col-lg-3">Pengarang</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->author?->name ?: '-' }}</dd>
+        <div class="col-lg-8">
+            <div class="card shadow-sm rounded-4 border-0">
+                <div class="card-body pt-3">
+                    <ul class="nav nav-tabs nav-tabs-bordered" id="bookDetailTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
+                                data-bs-target="#book-overview" type="button" role="tab" aria-controls="book-overview"
+                                aria-selected="true">Detail Utama</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="additional-tab" data-bs-toggle="tab"
+                                data-bs-target="#book-additional" type="button" role="tab"
+                                aria-controls="book-additional" aria-selected="false">Info Tambahan</button>
+                        </li>
+                    </ul>
 
-                        <dt class="col-sm-4 col-lg-3">Penerbit</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->publisher?->name ?: '-' }}</dd>
+                    <div class="tab-content pt-3" id="bookDetailTabContent">
 
-                        <dt class="col-sm-4 col-lg-3">Kategori</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->category?->name ?: '-' }}</dd>
+                        <div class="tab-pane fade show active p-3" id="book-overview" role="tabpanel"
+                            aria-labelledby="overview-tab">
 
-                        <dt class="col-sm-4 col-lg-3">ISBN</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->isbn ?: '-' }}</dd>
+                            <h5 class="card-title pb-2">Sinopsis</h5>
+                            <p class="small fst-italic">{!! nl2br(e($book->synopsis)) ?: 'Tidak ada sinopsis.' !!}</p>
 
-                        <dt class="col-sm-4 col-lg-3">Tahun Terbit</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->publication_year ?: '-' }}</dd>
+                            <h5 class="card-title pt-3 pb-2">Informasi Umum</h5>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Judul Lengkap</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->title }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Pengarang</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->author?->name ?: '-' }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Penerbit</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->publisher?->name ?: '-' }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Kategori</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->category?->name ?: '-' }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">ISBN</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->isbn ?: '-' }}</div>
+                            </div>
+                        </div>
 
-                        <dt class="col-sm-4 col-lg-3">Lokasi Rak</dt>
-                        <dd class="col-sm-8 col-lg-9">{{ $book->location ?: '-' }}</dd>
+                        <div class="tab-pane fade p-3" id="book-additional" role="tabpanel"
+                            aria-labelledby="additional-tab">
+                            <h5 class="card-title pb-2">Data Lainnya</h5>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Tahun Terbit</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->publication_year ?: '-' }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Lokasi Rak</div>
+                                <div class="col-lg-9 col-md-8">{{ $book->location ?: '-' }}</div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Ditambahkan Pada</div>
+                                <div class="col-lg-9 col-md-8">
+                                    {{ $book->created_at ? $book->created_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}
+                                </div>
+                            </div>
+                            <div class="detail-item row">
+                                <div class="col-lg-3 col-md-4 label">Diperbarui Pada</div>
+                                <div class="col-lg-9 col-md-8">
+                                    {{ $book->updated_at ? $book->updated_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}
+                                </div>
+                            </div>
+                        </div>
 
-                        <dt class="col-sm-4 col-lg-3">Tanggal Ditambahkan</dt>
-                        <dd class="col-sm-8 col-lg-9">
-                            {{ $book->created_at ? $book->created_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}</dd>
-
-                        <dt class="col-sm-4 col-lg-3">Terakhir Diperbarui</dt>
-                        <dd class="col-sm-8 col-lg-9">
-                            {{ $book->updated_at ? $book->updated_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}</dd>
-
-                        <dt class="col-sm-12">Sinopsis</dt>
-                        <dd class="col-sm-12 mt-1">{!! nl2br(e($book->synopsis)) ?: '-' !!}</dd>
-                    </dl>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <label class="form-label">Gambar Sampul</label>
-                    <div>
-                        <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('assets/images/no-image.png') }}"
-                            alt="Sampul {{ $book->title }}" class="img-thumbnail mb-2"
-                            style="max-height: 300px; max-width: 100%;">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Eksemplar ({{ $book->copies->count() }} Total)</h6>
-        </div>
-        <div class="card-body">
-            @if ($book->copies->isEmpty())
-                <div class="alert alert-info text-center">
-                    Belum ada data eksemplar untuk buku ini.
-                </div>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm table-striped" width="100%" cellspacing="0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="text-center">No.</th>
-                                <th>Kode Eksemplar</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Kondisi</th>
-                                <th>Ditambahkan</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($book->copies as $index => $copy)
-                                <tr>
-                                    <td class="text-center">{{ $index + 1 }}</td>
-                                    <td>{{ $copy->copy_code }}</td>
-                                    <td class="text-center">
-                                        <span class="badge bg-{{ $copy->status->badgeColor() }}">
-                                            {{ $copy->status->label() }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-{{ $copy->condition->badgeColor() }}">
-                                            {{ $copy->condition->label() }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $copy->created_at ? $copy->created_at->isoFormat('D MMM YYYY, HH:mm') : '-' }}
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </div>
-        <div class="card-footer">
-            <a href="{{ route('admin.books.index') }}" class="btn btn-secondary btn-sm">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Buku
-            </a>
-        </div>
-    </div>
-
 @endsection
 
 @section('css')
     <style>
-        dl.row dt {
-            margin-bottom: 0.5rem;
+        .nav-tabs-bordered {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .nav-tabs-bordered .nav-link {
+            margin-bottom: -2px;
+            border: none;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tabs-bordered .nav-link:hover,
+        .nav-tabs-bordered .nav-link:focus {
+            color: var(--bs-primary);
+        }
+
+        .nav-tabs-bordered .nav-link.active {
+            background-color: transparent;
+            color: var(--bs-primary);
+            border-bottom: 2px solid var(--bs-primary);
+            font-weight: 600;
+        }
+
+        .card-title {
+            padding-bottom: 1rem;
+            margin-bottom: 0;
+            color: var(--bs-primary);
+            font-weight: 600;
+        }
+
+        .detail-item {
+            padding: 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .detail-item .label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge.rounded-pill {
+            padding: 0.4em 0.8em;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
     </style>
 @endsection

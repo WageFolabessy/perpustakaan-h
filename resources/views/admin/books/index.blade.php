@@ -4,10 +4,10 @@
 @section('page-title', 'Manajemen Buku')
 
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">Daftar Buku</h6>
-            <a href="{{ route('admin.books.create') }}" class="btn btn-primary btn-sm">
+    <div class="card shadow-sm rounded-4 border-0 mb-4">
+        <div class="card-header bg-white py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-semibold">Daftar Buku</h6>
+            <a href="{{ route('admin.books.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg me-1"></i> Tambah Buku
             </a>
         </div>
@@ -20,17 +20,14 @@
                 </div>
             @else
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-striped datatable" id="dataTableBooks"
-                        width="100%" cellspacing="0">
-                        <thead class="table-light">
+                    <table class="table table-hover datatable" id="dataTableBooks" width="100%">
+                        <thead>
                             <tr>
                                 <th class="text-center no-sort" width="1%">No</th>
-                                <th class="text-center no-sort">Sampul</th>
-                                <th>Judul</th>
+                                <th class="text-center no-sort" width="5%">Sampul</th>
+                                <th width="30%">Judul & ISBN</th>
                                 <th>Pengarang</th>
                                 <th>Kategori</th>
-                                <th>ISBN</th>
-                                <th>Lokasi</th>
                                 <th class="text-center">Jml Eksemplar</th>
                                 <th class="text-center action-column no-sort">Aksi</th>
                             </tr>
@@ -41,30 +38,27 @@
                                     <td class="text-center">{{ $loop->iteration }}</td>
                                     <td class="text-center">
                                         <img src="{{ $book->cover_image ? asset('storage/' . $book->cover_image) : asset('assets/images/no-image.png') }}"
-                                            alt="{{ $book->title }}" height="60"
-                                            style="max-width: 50px; object-fit: contain;">
+                                            alt="{{ $book->title }}" class="book-cover">
                                     </td>
                                     <td>
-                                        <span class="truncate-text" title="{{ $book->title }}">
-                                            {{ $book->title }}
-                                        </span>
+                                        <div class="fw-semibold book-title" title="{{ $book->title }}">{{ $book->title }}
+                                        </div>
+                                        <small class="text-muted d-block">ISBN: {{ $book->isbn ?: '-' }}</small>
                                     </td>
                                     <td>{{ $book->author?->name ?: '-' }}</td>
                                     <td>{{ $book->category?->name ?: '-' }}</td>
-                                    <td>{{ $book->isbn ?: '-' }}</td>
-                                    <td>{{ $book->location ?: '-' }}</td>
                                     <td class="text-center">{{ $book->copies_count }}</td>
                                     <td class="action-column text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{{ route('admin.books.show', $book) }}" class="btn btn-info"
-                                                title="Detail">
+                                            <a href="{{ route('admin.books.show', $book) }}"
+                                                class="btn btn-outline-primary" title="Detail">
                                                 <i class="bi bi-eye-fill"></i>
                                             </a>
-                                            <a href="{{ route('admin.books.edit', $book) }}" class="btn btn-warning"
-                                                title="Edit">
+                                            <a href="{{ route('admin.books.edit', $book) }}"
+                                                class="btn btn-outline-warning" title="Edit">
                                                 <i class="bi bi-pencil-fill"></i>
                                             </a>
-                                            <button type="button" class="btn btn-danger" title="Hapus"
+                                            <button type="button" class="btn btn-outline-danger" title="Hapus"
                                                 data-bs-toggle="modal" data-bs-target="#deleteModal-{{ $book->id }}">
                                                 <i class="bi bi-trash-fill"></i>
                                             </button>
@@ -111,28 +105,33 @@
 
 @section('css')
     <style>
-        .truncate-text {
-            max-width: 250px;
+        .table thead th {
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom-width: 1px;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .book-cover {
+            height: 60px;
+            width: 50px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+
+        .book-title {
+            max-width: 350px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            display: inline-block;
-            vertical-align: middle
         }
 
         .action-column {
             white-space: nowrap;
             width: 1%;
-            text-align: center
-        }
-
-        .action-column .btn .bi {
-            vertical-align: middle
-        }
-
-        td img {
-            display: block;
-            margin: auto
         }
     </style>
 @endsection
