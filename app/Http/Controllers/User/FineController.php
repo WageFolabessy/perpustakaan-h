@@ -31,6 +31,23 @@ class FineController extends Controller
             ->where('status', FineStatus::Unpaid)
             ->sum('amount');
 
-        return view('user.fines.index', compact('fines', 'totalUnpaidFines'));
+        $unpaidFinesCount = Fine::whereHas('borrowing', function ($query) use ($user) {
+            $query->where('site_user_id', $user->id);
+        })
+            ->where('status', FineStatus::Unpaid)
+            ->count();
+
+        $paidFinesCount = Fine::whereHas('borrowing', function ($query) use ($user) {
+            $query->where('site_user_id', $user->id);
+        })
+            ->where('status', FineStatus::Paid)
+            ->count();
+
+        return view('user.fines.index', compact(
+            'fines',
+            'totalUnpaidFines',
+            'unpaidFinesCount',
+            'paidFinesCount'
+        ));
     }
 }

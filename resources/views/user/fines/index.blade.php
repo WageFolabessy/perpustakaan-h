@@ -33,8 +33,15 @@
     @include('admin.components.flash_messages')
 
     @php
-        $unpaidFines = $fines->where('status.value', 'unpaid');
-        $paidFines = $fines->where('status.value', 'paid');
+        use App\Enum\FineStatus;
+
+        $unpaidFines = $fines->filter(function ($fine) {
+            return $fine->status === FineStatus::Unpaid;
+        });
+
+        $paidFines = $fines->filter(function ($fine) {
+            return $fine->status === FineStatus::Paid;
+        });
     @endphp
 
     <ul class="nav nav-tabs nav-fill mb-3" id="finesTab" role="tablist">
@@ -42,14 +49,14 @@
             <button class="nav-link active" id="unpaid-tab" data-bs-toggle="tab" data-bs-target="#unpaid-tab-pane"
                 type="button" role="tab" aria-controls="unpaid-tab-pane" aria-selected="true">
                 <i class="bi bi-hourglass-split me-1"></i> Belum Dibayar
-                <span class="badge rounded-pill bg-danger ms-1">{{ $unpaidFines->count() }}</span>
+                <span class="badge rounded-pill bg-danger ms-1">{{ $unpaidFinesCount }}</span>
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="paid-tab" data-bs-toggle="tab" data-bs-target="#paid-tab-pane" type="button"
                 role="tab" aria-controls="paid-tab-pane" aria-selected="false">
                 <i class="bi bi-patch-check-fill me-1"></i> Riwayat Lunas
-                <span class="badge rounded-pill bg-secondary ms-1">{{ $paidFines->count() }}</span>
+                <span class="badge rounded-pill bg-secondary ms-1">{{ $paidFinesCount }}</span>
             </button>
         </li>
     </ul>
